@@ -1,0 +1,650 @@
+===========================================ASPX====================================================================
+<%@Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true"
+    EnableEventValidation="false" CodeFile="voucher change.aspx.cs" Inherits="FAMS_TDSReceipt_voucher_change" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="sgg" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link href="../../css/FA_Msg.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/FA_1.css" rel="stylesheet" type="text/css" />
+    <script src="../../Jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        function chkdatmin(source, arg) {
+            var day, month, year;
+            var todate = document.getElementById('<%=lblVoucherDate%>');
+            day = todate.value.split("/")[0];
+            month = todate.value.split("/")[1];
+            year = todate.value.split("/")[2];
+            var todate1 = month + '/' + day + '/' + year;
+        }
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("[id*=lblVoucherDate]").hide();
+            $("[id*=lblVoucherDate1]").show();
+            $("[id*=txtnarr]").hide();
+            $("[id*=lblnarr]").show();
+
+            $("#<%=GridViewnew.ClientID%> input[id*='chkSelect']:checkbox").each(function () {
+                $(this).closest("tr").find("[id*=ddlNewAc]").val('0').attr("disabled", true);
+                $(this).closest("tr").find("[id*=chkSelect]").removeAttr('checked').attr("disabled", true);
+            });
+
+            $('#<%=ddlReqFor.ClientID%>').change(function () {
+                var requst = $('#<%=ddlReqFor.ClientID%> option:selected').val();
+                if (requst == '1') { //Date Change
+                    $("[id*=lblVoucherDate]").show();
+                    $("[id*=lblVoucherDate1]").hide();
+                    $("[id*=txtnarr]").hide();
+
+                    $("[id*=lblnarr]").show();
+                    $("[id*=lblVoucherDate]").attr("disabled", false);
+                    $("#<%=GridViewnew.ClientID%> input[id*='chkSelect']:checkbox").each(function () {
+                        $(this).closest("tr").find("[id*=ddlNewAc]").val('0').attr("disabled", true);
+                        $(this).closest("tr").find("[id*=chkSelect]").removeAttr('checked').attr("disabled", true);
+                    });
+                } else if (requst == '3') { //Account Change
+                    $("[id*=lblVoucherDate]").hide();
+                    $("[id*=lblVoucherDate1]").show();
+                    $("[id*=lblVoucherDate1]").attr("disabled", true);
+                    $("[id*=txtnarr]").hide();
+
+                    $("[id*=lblnarr]").show();
+                    $("#<%=GridViewnew.ClientID%> input[id*='chkSelect']:checkbox").each(function () {
+                        $(this).closest("tr").find("[id*=ddlNewAc]").val('0').attr("disabled", true);
+                        $(this).closest("tr").find("[id*=chkSelect]").removeAttr('checked').attr("disabled", false);
+                    });
+
+                } else if (requst == '2') { //Narration
+                    $("[id*=lblVoucherDate]").hide();
+                    $("[id*=lblVoucherDate1]").show();
+                    $("[id*=txtnarr]").show();
+                    $("[id*=lblnarr]").hide();
+                    $("#<%=GridViewnew.ClientID%> input[id*='chkSelect']:checkbox").each(function () {
+                        $(this).closest("tr").find("[id*=ddlNewAc]").val('0').attr("disabled", true);
+                        $(this).closest("tr").find("[id*=chkSelect]").removeAttr('checked').attr("disabled", true);
+                    });
+
+                } else {
+                    $("[id*=lblVoucherDate]").hide();
+                    $("[id*=lblVoucherDate1]").show();
+                    $("[id*=txtnarr]").hide();
+
+                    $("[id*=lblnarr]").show();
+
+                    $("#<%=GridViewnew.ClientID%> input[id*='chkSelect']:checkbox").each(function () {
+                        $(this).closest("tr").find("[id*=ddlNewAc]").val('0').attr("disabled", true);
+                        $(this).closest("tr").find("[id*=chkSelect]").removeAttr('checked').attr("disabled", true);
+                    });
+
+                }
+            });
+        });
+        $(document).ready(function () {
+            //$('#<%=ddlReqFor.ClientID %>').change(function () {
+
+            $("#<%=GridViewnew.ClientID%> input[id*='chkSelect']:checkbox").click(function () {
+                if ($("#<%=GridViewnew.ClientID%> input[id*='chkSelect']:checkbox").is(':checked')) {
+                    $(this).closest("tr").find("[id*=ddlNewAc]").val('0').attr("disabled", false);
+                }
+                else {
+                    $(this).closest("tr").find("[id*=ddlNewAc]").val('0').attr("disabled", true);
+                }
+            });
+            // });
+        });
+    </script>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+
+    <table id="tbl_f" width="100%" style="overflow: scroll;" runat="server">
+      <tr>
+      <td colspan="5">
+           <asp:Panel ID="ErrorContainer" runat="server" CssClass="EmptyError">
+                    <asp:Label ID="MyMessage" runat="server" Font-Size="10pt"></asp:Label>
+                </asp:Panel>
+      </td>
+
+</tr>
+        <tr>
+            <td class="FA_Left" style="width: 14%; text-align: center">
+                Branch:
+            </td>
+            <td class="FA_Left" style="width: 14%; text-align: center">
+                <asp:DropDownList ID="ddlbranch" runat="server" Width="250px" CssClass="ddlNormal">
+                </asp:DropDownList>
+                <asp:RequiredFieldValidator ID="rfvddlbranch" runat="server" ErrorMessage="Select Branch Name"
+                    ValidationGroup="Show2" ControlToValidate="ddlbranch" ToolTip="Select Branch Name" 
+                    InitialValue="0">*</asp:RequiredFieldValidator>
+            </td>
+            <td class="FA_Left" style="width: 14%; text-align: center">
+                Voucher No:
+            </td>
+            <td class="FA_Left" style="width: 14%">
+                <asp:TextBox ID="txtvoucherno" runat="server" CssClass="txtNormal" Width="200px"></asp:TextBox>
+            </td>
+            <td>
+                <asp:RequiredFieldValidator ID="RFV_VoucherNo" runat="server" ControlToValidate="txtVoucherNo"
+                    ValidationGroup="Show2" ErrorMessage="select voucher No">*</asp:RequiredFieldValidator>
+            </td>
+            <td class="FA_Left" style="width: 40%; text-align: center">
+                <asp:Button ID="btnShow" Width="100px" runat="server" CssClass="Submit" Text="Show"
+                    ValidationGroup="Show2" OnClick="btnShow_Click" />
+                <asp:ValidationSummary ID="ValidationSummary1" ValidationGroup="Show2" runat="server"
+                    ShowMessageBox="true" ShowSummary="false" />
+                     <asp:HiddenField runat="server" ID="hdnJid"></asp:HiddenField>
+                  <asp:HiddenField runat="server" ID="hdnjbranch"></asp:HiddenField>
+                   <asp:HiddenField runat="server" ID="hdnjcompcode"></asp:HiddenField>
+            </td>
+        </tr>
+    </table>
+    <table id="tbl_VoucherDtl4" runat="server" width="100%">
+        <tr>
+            <td class="con_header"  style="width:15%">
+                Voucher Details:
+            </td>
+            <td  style="width:85%">
+            &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td class="FA_Left" style="width:10%">
+                Request For :
+            </td>
+            <td  style="width: 90%;">
+                <asp:DropDownList ID="ddlReqFor" runat="server" Width="250px" CssClass="ddlNormal">
+                    <asp:ListItem Value="0" Text="Select Request For"></asp:ListItem>
+                    <asp:ListItem Value="1" Text="Change Date"></asp:ListItem>
+                    <asp:ListItem Value="2" Text="Change Narration"></asp:ListItem>
+                    <asp:ListItem Value="3" Text="Change Account Head"></asp:ListItem>
+                </asp:DropDownList>
+                <asp:RequiredFieldValidator ID="rfvddlReqFor" runat="server" ErrorMessage="RequiredFieldValidator"
+                    ValidationGroup="savegroup" ControlToValidate="ddlReqFor">
+                </asp:RequiredFieldValidator>
+            </td>
+        </tr>
+    </table>
+    <table id="tbl_voucherinfo" style="width: 100%; border: 2px solid:Navy" class="grid-view_1" runat="server">
+        <tr class="header_1">
+            <td class="a" style="width: 5%">
+                Voucher No
+            </td>
+            <td class="a" style="width: 10%">
+                Voucher Date
+            </td>
+            <td class="a" style="width: 5%">
+                Type
+            </td>
+            <td class="a" style="width: 20%">
+                In Favour Of
+            </td>
+            <td class="a" style="width: 10%">
+                Account Name
+            </td>
+            <td class="a" style="width: 10%">
+                Amount
+            </td>
+            <td class="a" style="width: 40%">
+                Narration
+            </td>
+        </tr>
+        <tr class="normal_1">
+            <td class="a" style="text-align: center">
+                <asp:Label ID="lblVoucherNo" Style="color: Navy;" HeaderText="VoucherNo" ReadOnly="True"
+                    SortExpression="ID" runat="server" Text="VoucherNo"></asp:Label>
+            </td>
+            <td class="a" style="text-align: center">
+                <asp:TextBox ID="lblVoucherDate" Style="color: Navy;" runat="server" Text="Voucher Date"
+                    Enabled="false"></asp:TextBox>
+                <asp:Label ID="lblVoucherDate1" runat="server"></asp:Label>
+                <sgg:calendarextender runat="server" id="ceIssueDate" targetcontrolid="lblVoucherDate"
+                    format="dd/MM/yyyy">
+                </sgg:calendarextender>
+                <asp:RequiredFieldValidator ID="rfvIssueDate" runat="server" ControlToValidate="lblVoucherDate"
+                    Display="Dynamic" ErrorMessage="Please select Date" ValidationGroup="savegroup">*</asp:RequiredFieldValidator>
+                <asp:CustomValidator ID="CustomValidator1" runat="server" ErrorMessage="*" ToolTip="Date should not be less than previous Date."
+                    ClientValidationFunction="chkdatmin" Display="Dynamic" ValidationGroup="savegroup"
+                    SetFocusOnError="True" ControlToValidate="lblVoucherDate">*</asp:CustomValidator>
+            </td>
+            <td class="a" style="text-align: center">
+                <asp:Label ID="lblType" Style="color: Navy" HeaderText="Type" ReadOnly="True" SortExpression="ID"
+                    runat="server" Text="Type"></asp:Label>
+            </td>
+            <td class="a" style="text-align: center">
+                <asp:Label ID="lblinfavnam" Style="color: Navy" HeaderText="InFavourOf" ReadOnly="True"
+                    SortExpression="ID" runat="server" Text="InFavourOf"></asp:Label>
+            </td>
+            <td class="a" style="text-align: center">
+                <asp:Label ID="lblAc" Style="color: Navy" HeaderText="AccountName" ReadOnly="True"
+                    SortExpression="ID" runat="server" Text="AccountName"></asp:Label>
+
+                     <asp:HiddenField runat="server" ID="hdnprevjaccode"></asp:HiddenField>
+                   <asp:HiddenField runat="server" ID="hdnnewjaccode"></asp:HiddenField>
+            </td>
+            <td class="a" style="text-align: center">
+                <asp:Label ID="lblAmt" Style="color: Navy" HeaderText="Amount" ReadOnly="True" SortExpression="ID"
+                    runat="server" Text="Amount"></asp:Label>
+            </td>
+            <td class="a">
+                <asp:Label ID="lblnarr" Style="color: Navy;" HeaderText="Narration" ReadOnly="True"
+                    SortExpression="ID" runat="server" Text="Narration"></asp:Label>
+                <asp:TextBox ID="txtnarr" Style="color: Navy;" TextMode="MultiLine" Width="400px"
+                    Text="Narration" runat="server">
+                </asp:TextBox>
+                <asp:RequiredFieldValidator ID="rfvnarr" runat="server" ControlToValidate="txtnarr"
+                    Display="Dynamic" ErrorMessage="Please Select Narration" ValidationGroup="savegroup">*</asp:RequiredFieldValidator>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;" class="FA_Left" colspan="7">
+                <asp:GridView ID="GridViewnew" runat="server" AutoGenerateColumns="false" CssClass="grid-view_1"
+                    EmptyDataText="Record Not Found" EnableTheming="True" ShowFooter="false" CellPadding="4"
+                    CellSpacing="0" Visible="true">
+                    <HeaderStyle CssClass="header_1" />
+                    <RowStyle CssClass="normal_1" />
+                    <FooterStyle CssClass="header_1" />
+                    <AlternatingRowStyle CssClass="alternaterow" />
+                    <Columns>
+                        <asp:TemplateField HeaderText="A/C Code Name" Visible="true">
+                            <ItemTemplate>
+                                <asp:Label ID="lbllName" runat="server" Visible="true" Text='<%#Eval("lName")%>'></asp:Label>
+                                   <asp:Label ID="lblJid" runat="server" Visible="true" Text='<%#Eval("Jid")%>' style="display:none;"></asp:Label>
+                                      <asp:Label ID="lbllid" runat="server" Visible="true" Text='<%#Eval("lid")%>' style="display:none;"></asp:Label>
+                                         <asp:Label ID="lblJSlNo" runat="server" Visible="true" Text='<%#Eval("JSlNo")%>' style="display:none;"></asp:Label>
+                            </ItemTemplate>
+                            <ItemStyle HorizontalAlign="Center" Width="20%" />
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Trans Type">
+                            <ItemTemplate>
+                                <asp:Label ID="lblName" runat="server" Text='<%#Eval("JTrans")%>'></asp:Label>
+                            </ItemTemplate>
+                            <ItemStyle HorizontalAlign="Center" Width="5%" />
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="DrAmt">
+                            <ItemTemplate>
+                                <asp:Label ID="lbldrJtrans" runat="server" Text='<%#Eval("DrAmt")%>'></asp:Label>
+                            </ItemTemplate>
+                            <ItemStyle HorizontalAlign="Center" Width="10%" />
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="CrAmt">
+                            <ItemTemplate>
+                                <asp:Label ID="lblcrJtrans" runat="server" Text='<%#Eval("CrAmt")%>'></asp:Label>
+                            </ItemTemplate>
+                            <ItemStyle HorizontalAlign="Center" Width="10%" />
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="New A/C">
+                            <ItemTemplate>
+                                <asp:DropDownList ID="ddlNewAc" runat="server" CssClass="ddlNormal" Width="98%" Enabled="false">
+                                    <asp:ListItem Value="0">Select</asp:ListItem>
+                                </asp:DropDownList>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Select">
+                            <ItemTemplate>
+                                <asp:CheckBox ID="chkSelect" runat="server" Width="5" />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
+                </asp:GridView>
+            </td>
+        </tr>
+        <tr>
+            <td class="FA_Left" style="width: 20%; text-align: center">
+                Remarks:
+            </td>
+            <td class="FA_Left" style="width: 40%; text-align: left" colspan="6">
+                <asp:TextBox runat="server" ID="txtRemarks" Visible="true" CssClass="txtMultiline"
+                    min-height="70px; width:98%;" TextMode="MultiLine" Height="71px"></asp:TextBox>
+                <asp:RequiredFieldValidator runat="server" ID="rfv_txtRemarks" Display="Dynamic"
+                    ValidationGroup="savegroup" ControlToValidate="txtRemarks" ErrorMessage="Please Enter Remarks ">*</asp:RequiredFieldValidator>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="7" class="FA_Left" style="text-align: center">
+                <asp:Button ID="btnSave" runat="server" CssClass="Submit" Text="Save" ValidationGroup="savegroup" OnClick="btnSave_Click" />
+                <asp:ValidationSummary ID="ValidationSummary2" ValidationGroup="savegroup" runat="server"
+                    ShowMessageBox="true" ShowSummary="false" />
+               
+            </td>
+        </tr>
+    </table>
+</asp:Content>
+
+===========================================CS===============================================================
+public partial class FAMS_TDSReceipt_voucher_change : System.Web.UI.Page
+{
+
+    Message msg = new Message();
+    BAL_EmployeeLevelAccess EmployeeLevelBAL = new BAL_EmployeeLevelAccess();
+    BAL_FA_VoucherRectification VR = new BAL_FA_VoucherRectification();
+    BAL_FA_Ledger_mst ledger = new BAL_FA_Ledger_mst();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        if (!IsPostBack)
+        {
+            Fill_ddlbranch(Session["Employee_Code"].ToString(), Session["Comp_Code"].ToString());
+            tbl_VoucherDtl4.Visible = false;
+            tbl_voucherinfo.Visible = false;
+
+        }
+    }
+
+
+
+    private void Fill_ddlbranch(string EmpCode, string compcode)
+    {
+        DataTable dtState = EmployeeLevelBAL.LoadEmployeeBranchAccessByCompany(EmpCode, compcode);
+        if (dtState.Rows.Count > 0)
+        {
+            ddlbranch.DataSource = dtState;
+            ddlbranch.DataTextField = "Branch_Name";
+            ddlbranch.DataValueField = "Branch_Code";
+            ddlbranch.DataBind();
+            ddlbranch.Items.Insert(0, "Select Branch");
+        }
+    }
+
+
+    protected void Fill_VoucherDtl(string JNo, string Branch_Code)
+    {
+        DataSet ds = VR.SearchVoucherDtl(JNo, Branch_Code);
+        if (ds != null)
+        {
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+            }
+        }
+
+
+    }
+    protected void btnShow_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            ErrorContainer.Visible = false;
+            tbl_VoucherDtl4.Visible = true;
+
+            ddlReqFor.ClearSelection();
+            DataSet ds = VR.SearchVoucherDtl(txtvoucherno.Text, ddlbranch.SelectedValue);
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                if (ds.Tables[0].Rows[0]["jid"].ToString() != "0")
+                {
+
+                    hdnJid.Value = ds.Tables[0].Rows[0]["jid"].ToString();
+                    hdnjbranch.Value = ds.Tables[0].Rows[0]["JBranch_Code"].ToString();
+                    hdnjcompcode.Value = ds.Tables[0].Rows[0]["JcompCode"].ToString();
+                    lblVoucherNo.Text = ds.Tables[0].Rows[0]["JNo"].ToString();
+                    lblVoucherDate1.Text = ds.Tables[0].Rows[0]["Jdate"].ToString();
+                    lblVoucherDate.Text = ds.Tables[0].Rows[0]["Jdate"].ToString();
+                    lblType.Text = ds.Tables[0].Rows[0]["JPayTo"].ToString();
+                    lblinfavnam.Text = ds.Tables[0].Rows[0]["InFavourName"].ToString();
+                    lblAc.Text = ds.Tables[0].Rows[0]["JAcccode_Name"].ToString();
+                    lblAmt.Text = ds.Tables[0].Rows[0]["JAmt"].ToString();
+                    lblnarr.Text = ds.Tables[0].Rows[0]["JMemo"].ToString();
+                    txtnarr.Text = ds.Tables[0].Rows[0]["JMemo"].ToString();
+                    GridViewnew.DataSource = ds.Tables[1];
+                    GridViewnew.DataBind();
+                    GridViewnew.Visible = true;
+                    tbl_VoucherDtl4.Visible = true;
+                    tbl_voucherinfo.Visible = true;
+                    foreach (GridViewRow gv in GridViewnew.Rows)
+                    {
+                        DropDownList ddlAccountName = (DropDownList)gv.FindControl("ddlNewAc");
+                        Fill_AccountName(ddlAccountName);
+                    }
+                }
+                else
+                {
+                    tbl_VoucherDtl4.Visible = false;
+                    GridViewnew.Visible = false;
+                    tbl_voucherinfo.Visible = false;
+                    ErrorContainer.Visible = true;
+                    msg.ShowMessage("Voucher Details Not available!", null, ErrorContainer, MyMessage, "Warning");
+                }
+            }
+            else
+            {
+                tbl_VoucherDtl4.Visible = false;
+                GridViewnew.Visible = false;
+                tbl_voucherinfo.Visible = false;
+                ErrorContainer.Visible = true;
+                msg.ShowMessage("Voucher Details Not available!", null, ErrorContainer, MyMessage, "Warning");
+            }
+        }
+
+        catch
+        {
+        }
+    }
+    private void Fill_AccountName(DropDownList ddl)
+    {
+        ddl.Items.Clear();
+        DataTable dt = ledger.FA_SelectLedger_ALL(Session["Comp_Code"].ToString());
+        DataView dv = dt.DefaultView;
+
+        dt = dv.ToTable();
+        if (dt.Rows.Count > 0)
+        {
+            ddl.DataSource = dt;
+            ddl.DataTextField = "lName";
+            ddl.DataValueField = "lid";
+            ddl.DataBind();
+            ddl.Items.Insert(0, new ListItem("Select Ledger Name", "0"));
+        }
+        else
+            ddl.Items.Insert(0, new ListItem("Select Ledger Name", "0"));
+    }
+
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+        DataTable dtjv = new DataTable();
+       
+        dtjv.Columns.Add("Jid", typeof(decimal));
+        dtjv.Columns.Add("JNO", typeof(string));
+        dtjv.Columns.Add("Prev_JDate", typeof(string));
+        dtjv.Columns.Add("New_JDate", typeof(string));
+        dtjv.Columns.Add("Prev_JMemo", typeof(string));
+        dtjv.Columns.Add("New_JMemo", typeof(string));
+        dtjv.Columns.Add("Prev_JAcccode", typeof(decimal));
+        dtjv.Columns.Add("New_JAcccode", typeof(decimal));
+        dtjv.Columns.Add("JSlNo", typeof(int));
+        dtjv.Columns.Add("JBranch_Code", typeof(string));
+        dtjv.Columns.Add("JComp_Code", typeof(string));
+        DataRow dr =null ;
+
+        if (Convert.ToInt32(ddlReqFor.SelectedValue) == 1)
+        {
+            dr = dtjv.NewRow();
+          
+            dr["Jid"] = Convert.ToDouble(hdnJid.Value);
+            dr["JNO"] = Convert.ToString(lblVoucherNo.Text);
+            dr["Prev_JDate"] = lblVoucherDate1.Text;
+            dr["New_JDate"] = lblVoucherDate.Text;
+            dr["Prev_JMemo"] = lblnarr.Text;
+            dr["New_JMemo"] = "";
+            dr["Prev_JAcccode"] = 0;
+            dr["New_JAcccode"] = 0;
+            dr["JSlNo"] = 0;
+            dr["JBranch_Code"] = Convert.ToString(hdnjbranch.Value);
+            dr["JComp_Code"] = Convert.ToString(hdnjcompcode.Value);
+            dtjv.Rows.Add(dr);
+        }
+        else if (Convert.ToInt32(ddlReqFor.SelectedValue) == 2)
+        {
+            dr = dtjv.NewRow();
+            dr["Jid"] = Convert.ToDecimal(hdnJid.Value);
+            dr["JNO"] = Convert.ToString(lblVoucherNo.Text);
+            dr["Prev_JDate"] = lblVoucherDate1.Text;
+            dr["New_JDate"] = "";
+            dr["Prev_JMemo"] = lblnarr.Text;
+            dr["New_JMemo"] = txtnarr.Text;
+            dr["Prev_JAcccode"] = 0;
+            dr["New_JAcccode"] = 0;
+            dr["JSlNo"] = 0;
+            dr["JBranch_Code"] = Convert.ToString(hdnjbranch.Value);
+            dr["JComp_Code"] = Convert.ToString(hdnjcompcode.Value);
+            dtjv.Rows.Add(dr);
+        }
+        else if (Convert.ToInt32(ddlReqFor.SelectedValue) == 3)
+        {
+            foreach (GridViewRow gvr in GridViewnew.Rows)
+            {
+                CheckBox chkSelect = (CheckBox)gvr.FindControl("chkSelect");
+                if (chkSelect.Checked)
+                {
+                    Label lbllName = (Label)gvr.FindControl("lbllName");
+                    Label lblJid = (Label)gvr.FindControl("lblJid");
+                    Label lbllid = (Label)gvr.FindControl("lbllid");
+                    Label lblJSlNo = (Label)gvr.FindControl("lblJSlNo");
+                    Label lblName = (Label)gvr.FindControl("lblName");
+                    Label lbldrJtrans = (Label)gvr.FindControl("lbldrJtrans");
+                    Label lblcrJtrans = (Label)gvr.FindControl("lblcrJtrans");
+
+                    DropDownList ddlNewAc = (DropDownList)gvr.FindControl("ddlNewAc");
+
+                    dr = dtjv.NewRow();
+                    dr["Jid"] = Convert.ToDouble(lblJid.Text);
+                    dr["JNO"] = Convert.ToString(lblVoucherNo.Text);
+                    dr["Prev_JDate"] = lblVoucherDate1.Text;
+                    dr["New_JDate"] = "";
+                    dr["Prev_JMemo"] = Convert.ToString(lblnarr.Text);
+                    dr["New_JMemo"] = "";
+                    dr["Prev_JAcccode"] = Convert.ToDecimal(lbllid.Text);
+                    dr["New_JAcccode"] = Convert.ToDecimal(ddlNewAc.SelectedValue);
+                    dr["JSlNo"] = Convert.ToInt16(lblJSlNo.Text);
+                    dr["JBranch_Code"] = Convert.ToString(hdnjbranch.Value);
+                    dr["JComp_Code"] = Convert.ToString(hdnjcompcode.Value);
+                    dtjv.Rows.Add(dr);
+
+                }
+            }
+        }
+
+        string result = "";
+        if (Convert.ToInt32(ddlReqFor.SelectedValue) > 0)
+        {
+           // result = VR.update_JV_Details(Convert.ToInt32(ddlReqFor.SelectedValue), Session["Employee_Code"].ToString(), dtjv);
+            if (result == "")
+            {
+                msg.ShowMessage("Voucher deatils  Updated Successfully", null, ErrorContainer, MyMessage, "Success");
+            }
+            else
+            {
+                msg.ShowMessage(result, null, ErrorContainer, MyMessage, "Warning");
+            }
+
+        }
+        else
+        {
+            msg.ShowMessage("Please enter atleast request type.", null, ErrorContainer, MyMessage, "Warning");
+        }
+
+    }
+
+
+
+}
+         
+=========================================BAL+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  public string update_JV_Details(int RequestType, string JV_UpdateBy, DataTable dtjv)
+    {
+        DAL_FA_VoucherRectification VR = new DAL_FA_VoucherRectification();
+        try
+        {
+            return VR.update_JV_Details(RequestType, JV_UpdateBy, dtjv);
+            }
+        catch
+        {
+            throw;
+        }
+        finally
+        {
+            VR = null;
+        }
+    }
+
+========================================DAL+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  public string update_JV_Details(int RequestType, string JV_UpdateBy, DataTable dtjv)
+    {
+        SqlCommand dCmd = new SqlCommand();
+        SqlConnection conn = new SqlConnection(connStr);
+        conn.Open();
+        mytrans = conn.BeginTransaction();
+        int ReturnVal = 0; string result = "";
+        try
+        {
+           
+            if (dtjv.Rows.Count > 0)
+            {
+                for (int i = 0; i < dtjv.Rows.Count; i++)
+                {
+                    dCmd = new SqlCommand("[Usp_Update_FA_Journal_Dtls]", conn);
+                    dCmd.CommandType = CommandType.StoredProcedure;
+                    dCmd.Transaction = mytrans;
+
+
+                    SqlParameter sqlp = new SqlParameter();
+                    sqlp = dCmd.Parameters.Add("@ErrorMsg", SqlDbType.VarChar, 200);
+                    sqlp.Direction = ParameterDirection.Output;
+
+                    dCmd.Parameters.AddWithValue("@RequestType", RequestType);
+                    //dCmd.Parameters.AddWithValue("@JV_UpdateBy ", JV_UpdateBy);
+                    dCmd.Parameters.AddWithValue("@Jid", Convert.ToDecimal(dtjv.Rows[i]["Jid"]));
+                    dCmd.Parameters.AddWithValue("@Jno", Convert.ToString(dtjv.Rows[i]["Jno"]));
+                    dCmd.Parameters.AddWithValue("@JDate", Convert.ToString(dtjv.Rows[i]["JDate"]));
+                    dCmd.Parameters.AddWithValue("@JMemo", Convert.ToString(dtjv.Rows[i]["JMemo"]));
+                    dCmd.Parameters.AddWithValue("@JAcccode", Convert.ToDecimal(dtjv.Rows[i]["JAcccode"]));
+                    dCmd.Parameters.AddWithValue("@Prev_JAccode", Convert.ToDecimal(dtjv.Rows[i]["Prev_JAccode"]));
+                    dCmd.Parameters.AddWithValue("@JSlNo", Convert.ToInt32(dtjv.Rows[i]["JSlNo"]));
+                    dCmd.Parameters.AddWithValue("@JBranch_Code", Convert.ToString(dtjv.Rows[i]["JBranch_Code"]));
+                    dCmd.Parameters.AddWithValue("@JComp_Code", Convert.ToString(dtjv.Rows[i]["JComp_Code"]));
+                    dCmd.ExecuteNonQuery();
+
+                    result = (string)dCmd.Parameters["@ErrorMsg"].Value;
+                }
+
+            }
+
+            if (result != "")
+            {
+                dCmd = new SqlCommand("[usp_Insert_Journal_update_log]", conn);
+                dCmd.CommandType = CommandType.StoredProcedure;
+                dCmd.Transaction = mytrans;
+                dCmd.Parameters.AddWithValue("@RequestType", RequestType);
+                dCmd.Parameters.AddWithValue("@JV_UpdateBy", JV_UpdateBy);
+                dCmd.Parameters.AddWithValue("@dtjv", dtjv);
+
+                SqlParameter sqlp2 = new SqlParameter();
+                sqlp2 = dCmd.Parameters.Add("@JV_LogId", SqlDbType.Int, 18);
+                sqlp2.Direction = ParameterDirection.Output;
+                dCmd.ExecuteNonQuery();
+
+                result = (string)dCmd.Parameters["@ErrorMsg"].Value;
+                ReturnVal = (int)dCmd.Parameters["@JV_LogId"].Value;
+                if (ReturnVal.Equals(-1))
+                {
+                    mytrans.Rollback();
+                   
+                }
+                else 
+                {
+                    mytrans.Commit();
+                }
+            }
+            return result;
+        }
+        catch
+        {
+            mytrans.Rollback();
+            throw;
+
+        }
+        finally
+        {
+            dCmd.Dispose();
+            conn.Close();
+            conn.Dispose();
+        }
+    }
+}
